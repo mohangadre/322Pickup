@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Pickup Ball - Home</title>
+      <title>Pickup Ball - Signup</title>
       <link href="styles.css" rel="stylesheet">
       <script src="js_code.js" defer></script>
    </head>
@@ -12,46 +12,59 @@
       <header class="site-header">
          <h1>Pickup Ball</h1>
       </header>
+
       <nav class="navbar">
          <a href="index.html">Home Page</a>
          <a href="schedule.html">Games Schedule Page</a>
          <a href="availability.html">Availability Page</a>
+
+         <span id="navUsername"></span>
+         <a href="#" id="authLink"></a>
       </nav>
+
       <main>
-        <section class="card3">
+         <section class="card3">
             <div class="grid-container2">
-                <div class="signupbox">
-                    <h2>Signup</h2>
-                    <form>
-                        <div class="form-row">
-                            <label for="fullname">Full Name:</label>
-                            <input type="fullname" id="fullname" name="fullname" class="fullname">
-                        </div>
-                        <div class="form-row">
-                            <label for="username">User Name:</label>
-                            <input type="username" id="username" name="username" class="username">
-                        </div>
-                        <div class="form-row">
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" name="email" class="email">
-                        </div>
-                        <div class="form-row">
-                            <label for="phone">Phone:</label>
-                            <input type="phone" id="phone" name="phone" class="phone">
-                        </div>
-                        <div class="form-row2">
-                            <label for="password2">Password:</label>
-                            <input type="password" id="password2" name="password2" class="password2">
-                        </div>
-                        <div id="formErrors"></div>
-                        <div class="button-container">
-                            <button class="submitbutton" id="submit">Sign Up</button>
-                        </div>
-                    </div>
-                    </form>
-                </div>
+               <div class="signupbox">
+                  <h2>Signup</h2>
+
+                  <form id="signupForm">
+                     <div class="form-row">
+                        <label for="fullname">Full Name:</label>
+                        <input type="text" id="fullname" name="fullname" class="fullname">
+                     </div>
+
+                     <div class="form-row">
+                        <label for="username">User Name:</label>
+                        <input type="text" id="username" name="username" class="username">
+                     </div>
+
+                     <div class="form-row">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" class="email">
+                     </div>
+
+                     <div class="form-row">
+                        <label for="phone">Phone:</label>
+                        <input type="text" id="phone" name="phone" class="phone">
+                     </div>
+
+                     <div class="form-row2">
+                        <label for="password2">Password:</label>
+                        <input type="password" id="password2" name="password2" class="password2">
+                     </div>
+
+                     <div id="formErrors"></div>
+
+                     <div class="button-container">
+                        <button type="button" class="submitbutton" id="signupButton">
+                           Sign Up
+                        </button>
+                     </div>
+                  </form>
+               </div>
             </div>
-        </section>
-        </main>
-    </body>
+         </section>
+      </main>
+   </body>
 </html>

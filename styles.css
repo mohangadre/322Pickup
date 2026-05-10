@@ -29,6 +29,8 @@ body {
    flex-wrap: wrap;
    gap: 10px;
    padding: 12px;
+   color: yellow;
+   align-items: center;
 }
 
 .navbar a {
