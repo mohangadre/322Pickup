@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Pickup Ball - Home</title>
+      <title>Pickup Ball - Login</title>
       <link href="styles.css" rel="stylesheet">
       <script src="js_code.js" defer></script>
    </head>
@@ -12,34 +12,44 @@
       <header class="site-header">
          <h1>Pickup Ball</h1>
       </header>
+
       <nav class="navbar">
          <a href="index.html">Home Page</a>
          <a href="schedule.html">Games Schedule Page</a>
          <a href="availability.html">Availability Page</a>
+
+         <span id="navUsername"></span>
+         <a href="#" id="authLink"></a>
       </nav>
+
       <main>
-        <section class="card2">
+         <section class="card2">
             <div class="grid-container">
-                <div class="loginbox">
-                    <h2>Login</h2>
-                    <form>
-                        <div class="form-row">
-                            <label for="login">Login ID:</label>
-                            <input type="login" id="login" name="login" class="loginid">
-                        </div>
-                        <div class="form-row2">
-                            <label for="password">Password:</label>
-                            <input type="password" id="password" name="password" class="password">
-                        </div>
-                        <div id="formErrors"></div>
-                        <div class="button-container">
-                            <button class="submitbutton" id="submit">Login</button>
-                        </div>
-                    </div>
-                    </form>
-                </div>
+               <div class="loginbox">
+                  <h2>Login</h2>
+
+                  <form id="loginForm">
+                     <div class="form-row">
+                        <label for="login">Login ID:</label>
+                        <input type="text" id="login" name="login" class="loginid">
+                     </div>
+
+                     <div class="form-row2">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" class="password">
+                     </div>
+
+                     <div id="formErrors"></div>
+
+                     <div class="button-container">
+                        <button type="button" class="submitbutton" id="loginButton">
+                           Login
+                        </button>
+                     </div>
+                  </form>
+               </div>
             </div>
-        </section>
-        </main>
-    </body>
+         </section>
+      </main>
+   </body>
 </html>
