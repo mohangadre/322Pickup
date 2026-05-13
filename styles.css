@@ -540,6 +540,29 @@ tr:nth-child(even) {
    border-bottom: none;
 }
 
+.popover-games-list {
+   list-style: none;
+   margin: 0 0 4px;
+   padding: 0;
+   font-size: 0.78rem;
+   line-height: 1.45;
+}
+
+.popover-game-line {
+   padding: 5px 0;
+   border-bottom: 1px solid #eef4ff;
+   color: #333;
+}
+
+.popover-game-line:last-child {
+   border-bottom: none;
+}
+
+.popover-game-line--joined {
+   color: #166534;
+   font-weight: bold;
+}
+
 @media screen and (max-width: 860px) {
    .schedule-locations {
       grid-template-columns: 1fr;
@@ -645,6 +668,16 @@ tr:nth-child(even) {
    font-size: 1.05rem;
    color: #0b2d5c;
    font-weight: bold;
+}
+
+.game-card.game-card--joined {
+   border-color: #2e7d32;
+   border-width: 2px;
+   background-color: #ecf8ee;
+}
+
+.game-card.game-card--joined .game-card-detail.game-card-detail-only {
+   color: #1b5e20;
 }
 
 .player-count {

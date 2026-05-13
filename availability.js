@@ -2,66 +2,29 @@
 (function () {
    var MAX_PLAYERS = 10;
 
-   var GAMES = [
-      {
-         id: 'cas-1',
-         mode: 'casual',
-         detail: 'Sat · 9:00 AM · Joseph Alioto Recreation Center',
-      },
-      {
-         id: 'cas-2',
-         mode: 'casual',
-         detail: 'Wed · 12:00 PM · Moraga Commons',
-      },
-      {
-         id: 'cas-3',
-         mode: 'casual',
-         detail: 'Sun · 2:00 PM · Moraga Commons',
-      },
-      {
-         id: 'cmp-1',
-         mode: 'competitive',
-         detail: 'Tue · 6:00 PM · Joseph Alioto Recreation Center',
-      },
-      {
-         id: 'cmp-2',
-         mode: 'competitive',
-         detail: 'Thu · 7:00 PM · Joseph Alioto Recreation Center',
-      },
-      {
-         id: 'cmp-3',
-         mode: 'competitive',
-         detail: 'Sun · 5:00 PM · Moraga Commons',
-      },
-   ];
-
-
-   var ROSTER_KEY = 'pickupball_rosters_v2';
-
-   function loadRosterMap() {
-      try {
-         var raw = localStorage.getItem(ROSTER_KEY);
-         if (raw) return JSON.parse(raw);
-      } catch (_) {}
-      return null;
-   }
-
-   function saveRosterMap(map) {
-      localStorage.setItem(ROSTER_KEY, JSON.stringify(map));
+   function getDefs() {
+      return typeof window.pickupGames !== 'undefined'
+         ? window.pickupGames.defs
+         : window.PICKUP_GAME_DEFINITIONS || [];
    }
 
    function getRoster(gameId) {
-      var map = loadRosterMap();
-      if (map && Object.prototype.hasOwnProperty.call(map, gameId)) {
-         return map[gameId].slice();
-      }
-      return [];
+      return typeof window.pickupGames !== 'undefined'
+         ? window.pickupGames.getRoster(gameId)
+         : [];
    }
 
    function setRoster(gameId, players) {
-      var map = loadRosterMap() || {};
-      map[gameId] = players;
-      saveRosterMap(map);
+      if (typeof window.pickupGames !== 'undefined') {
+         window.pickupGames.setRoster(gameId, players);
+      }
+   }
+
+   function formatDetail(game) {
+      if (typeof window.pickupGames !== 'undefined' && window.pickupGames.formatAvailabilityDetail) {
+         return window.pickupGames.formatAvailabilityDetail(game);
+      }
+      return game.location || '';
    }
 
    function escapeHtml(s) {
@@ -71,9 +34,11 @@
    }
 
    function render() {
-      var user = window.PickupBallAuth && window.PickupBallAuth.getCurrentUser
-         ? window.PickupBallAuth.getCurrentUser()
-         : null;
+      var defs = getDefs();
+      var user =
+         window.PickupBallAuth && window.PickupBallAuth.getCurrentUser
+            ? window.PickupBallAuth.getCurrentUser()
+            : null;
       var loggedIn = !!user;
 
       var casualMount = document.getElementById('casual-games-list');
@@ -90,16 +55,20 @@
          logoutLink.style.display = loggedIn ? 'inline' : 'none';
       }
 
-      if (casualMount) {
-         casualMount.innerHTML = GAMES.filter(function (g) { return g.mode === 'casual'; })
-            .map(function (g) { return renderGameCard(g, user, loggedIn); })
+      function renderColumn(mountEl, mode) {
+         if (!mountEl) return;
+         mountEl.innerHTML = defs
+            .filter(function (g) {
+               return g.mode === mode;
+            })
+            .map(function (g) {
+               return renderGameCard(g, user, loggedIn);
+            })
             .join('');
       }
-      if (compMount) {
-         compMount.innerHTML = GAMES.filter(function (g) { return g.mode === 'competitive'; })
-            .map(function (g) { return renderGameCard(g, user, loggedIn); })
-            .join('');
-      }
+
+      renderColumn(casualMount, 'casual');
+      renderColumn(compMount, 'competitive');
 
       attachHandlers(user, loggedIn);
    }
@@ -111,9 +80,11 @@
       var full = n >= MAX_PLAYERS;
 
       var namesHtml = roster.length
-         ? '<ul class="player-list">' + roster.map(function (p) {
-            return '<li' + (loggedIn && p === user ? ' class="player-self"' : '') + '>' + escapeHtml(p) + '</li>';
-         }).join('') + '</ul>'
+         ? '<ul class="player-list">' +
+           roster.map(function (p) {
+              return '<li' + (loggedIn && p === user ? ' class="player-self"' : '') + '>' + escapeHtml(p) + '</li>';
+           }).join('') +
+           '</ul>'
          : '<p class="player-empty">No players yet.</p>';
 
       var actionHtml;
@@ -125,26 +96,46 @@
       } else if (inGame) {
          actionHtml =
             '<div class="game-actions">' +
-            '<button type="button" class="btn-action btn-leave" data-game-id="' + escapeHtml(game.id) + '" data-action="leave">Leave game</button>' +
+            '<button type="button" class="btn-action btn-leave" data-game-id="' +
+            escapeHtml(game.id) +
+            '" data-action="leave">Leave game</button>' +
             '</div>';
       } else if (full) {
          actionHtml =
             '<div class="game-actions">' +
-            '<button type="button" class="btn-action btn-action-locked" disabled>This game is full (' + MAX_PLAYERS + '/' + MAX_PLAYERS + ')</button>' +
+            '<button type="button" class="btn-action btn-action-locked" disabled>This game is full (' +
+            MAX_PLAYERS +
+            '/' +
+            MAX_PLAYERS +
+            ')</button>' +
             '</div>';
       } else {
          actionHtml =
             '<div class="game-actions">' +
-            '<button type="button" class="btn-action btn-join" data-game-id="' + escapeHtml(game.id) + '" data-action="join">Join game</button>' +
+            '<button type="button" class="btn-action btn-join" data-game-id="' +
+            escapeHtml(game.id) +
+            '" data-action="join">Join game</button>' +
             '</div>';
       }
 
+      var detailLine = formatDetail(game);
+
       return (
-         '<article class="game-card" data-game-id="' + escapeHtml(game.id) + '">' +
+         '<article class="game-card' +
+         (inGame ? ' game-card--joined' : '') +
+         '" data-game-id="' +
+         escapeHtml(game.id) +
+         '">' +
          '<header class="game-card-head">' +
-         '<p class="game-card-detail game-card-detail-only">' + escapeHtml(game.detail) + '</p>' +
+         '<p class="game-card-detail game-card-detail-only">' +
+         escapeHtml(detailLine) +
+         '</p>' +
          '</header>' +
-         '<p class="player-count">Players: <strong>' + n + '</strong> / ' + MAX_PLAYERS + '</p>' +
+         '<p class="player-count">Players: <strong>' +
+         n +
+         '</strong> / ' +
+         MAX_PLAYERS +
+         '</p>' +
          namesHtml +
          actionHtml +
          '</article>'
@@ -166,7 +157,9 @@
                if (roster.indexOf(user) !== -1) return;
                roster.push(user);
             } else if (action === 'leave') {
-               roster = roster.filter(function (p) { return p !== user; });
+               roster = roster.filter(function (p) {
+                  return p !== user;
+               });
             } else {
                return;
             }

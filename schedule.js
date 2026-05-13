@@ -50,6 +50,43 @@
       );
    }
 
+   function renderGamesPopoverSection(locationName, year, monthIndex, dayNum) {
+      const pg = window.pickupGames;
+      if (!pg) return '';
+
+      const matches = pg.gamesMatchingCalendarDay(locationName, year, monthIndex, dayNum);
+      if (!matches.length) return '';
+
+      let user =
+         window.PickupBallAuth && window.PickupBallAuth.getCurrentUser
+            ? window.PickupBallAuth.getCurrentUser()
+            : null;
+
+      const items = matches
+         .sort((a, b) => {
+            const ma = a.hour * 60 + a.minute;
+            const mb = b.hour * 60 + b.minute;
+            return ma - mb;
+         })
+         .map((g) => {
+            const roster = pg.getRoster(g.id);
+            const joined = !!user && roster.indexOf(user) !== -1;
+            const cls = joined
+               ? 'popover-game-line popover-game-line--joined'
+               : 'popover-game-line';
+            const line = pg.popoverSummaryLine(g);
+            return `<li class="${cls}">${escapeHtml(line)}</li>`;
+         })
+         .join('');
+
+      return (
+         '<p class="popover-label">Scheduled games</p>' +
+         '<ul class="popover-games-list">' +
+         items +
+         '</ul>'
+      );
+   }
+
    function mountCalendar(root) {
       if (!root) return;
 
@@ -77,6 +114,7 @@
                `<p class="popover-date">${escapeHtml(monthNames[viewMonth])} ${day}, ${viewYear}</p>` +
                `<p class="popover-label">Pickup windows</p>` +
                renderSlotsHtml() +
+               renderGamesPopoverSection(locationName, viewYear, viewMonth, day) +
                `</div></li>`
             );
          });

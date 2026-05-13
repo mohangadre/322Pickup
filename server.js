@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
@@ -9,10 +10,22 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
+function sendHtml(name) {
+  return (req, res) => {
+    res.sendFile(path.join(__dirname, name));
+  };
+}
+
+/** Clean URLs → static HTML (before POST handlers; static above already skips missing files via next()). */
+app.get("/signup", sendHtml("signup.html"));
+app.get("/login", sendHtml("login.html"));
+app.get("/availability", sendHtml("availability.html"));
+app.get("/schedule", sendHtml("schedule.html"));
+
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "BetsyZoeOlive2005",
+  password: "BetsyZoeOlive2006",
   database: "pickup_ball"
 });
 
