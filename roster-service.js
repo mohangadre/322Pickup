@@ -60,6 +60,15 @@
             });
          })
             .then(function () {
+               return ref.get();
+            })
+            .then(function (snap) {
+               var players = [];
+               if (snap.exists && snap.data().players) {
+                  players = snap.data().players.slice();
+               }
+               window.PICKUP_ROSTER_CACHE[gameId] = players;
+               dispatchRosterUpdate();
                if (cb) cb(null);
             })
             .catch(function (e) {
@@ -95,6 +104,15 @@
             });
          })
             .then(function () {
+               return ref.get();
+            })
+            .then(function (snap) {
+               var players = [];
+               if (snap.exists && snap.data().players) {
+                  players = snap.data().players.slice();
+               }
+               window.PICKUP_ROSTER_CACHE[gameId] = players;
+               dispatchRosterUpdate();
                if (cb) cb(null);
             })
             .catch(function (e) {
@@ -104,12 +122,12 @@
    };
 
    if (!firebaseReady()) {
-      console.info('[PickupRoster] Firebase SDK not loaded — using local rosters only.');
+      console.warn('[PickupRoster] Firebase SDK not loaded — using local rosters only.');
       return;
    }
 
    if (!configOk()) {
-      console.info('[PickupRoster] Add your Firebase web config in firebase-config.js for shared rosters.');
+      console.warn('[PickupRoster] Add your Firebase web config in firebase-config.js for shared rosters.');
       return;
    }
 
