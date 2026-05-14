@@ -51,6 +51,24 @@
       },
    };
 
+   /**
+    * API base URL for signup/login POST.
+    * - Set window.__PICKUP_API_BASE__ to your HTTPS backend (e.g. Railway/Render) on GitHub Pages.
+    * - On local Express (port 3000), uses same origin automatically.
+    * - Otherwise signup/login use offline demo mode (no DB).
+    */
+   function getApiBase() {
+      if (typeof window.__PICKUP_API_BASE__ === 'string' && window.__PICKUP_API_BASE__.trim()) {
+         return window.__PICKUP_API_BASE__.replace(/\/$/, '');
+      }
+      var h = window.location.hostname;
+      var p = window.location.port;
+      if ((h === 'localhost' || h === '127.0.0.1') && p === '3000') {
+         return window.location.origin;
+      }
+      return null;
+   }
+
    function bindAuthLink(navUsername, authLink) {
       if (!authLink || authLink.dataset.authBound === 'true') return;
       authLink.dataset.authBound = 'true';
@@ -110,8 +128,17 @@
 
             const errEl = formErrors || document.getElementById('formErrors');
 
+            var apiLogin = getApiBase();
+            if (!apiLogin) {
+               if (errEl) errEl.textContent = 'Signed in offline (demo — no database on this host).';
+               setCurrentUser(username);
+               updateNavbarLoginStatus();
+               window.location.href = 'index.html';
+               return;
+            }
+
             try {
-               const response = await fetch('http://localhost:3000/login', {
+               const response = await fetch(apiLogin + '/login', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -149,8 +176,33 @@
             event.preventDefault();
             const errEl = document.getElementById('formErrors');
 
+            var u = usernameInput.value ? usernameInput.value.trim() : '';
+            if (!u) {
+               if (errEl) errEl.textContent = 'Please enter a user name.';
+               return;
+            }
+
+            var pw = signupPasswordInput ? signupPasswordInput.value : '';
+            if (!pw || !String(pw).trim()) {
+               if (errEl) errEl.textContent = 'Please enter a password.';
+               return;
+            }
+
+            var apiSignup = getApiBase();
+
+            /** GitHub Pages / static host: localhost is each visitor’s phone, not your server — use demo signup. */
+            if (!apiSignup) {
+               if (errEl) {
+                  errEl.textContent = 'Offline signup — profile stored in this browser only (demo).';
+               }
+               setCurrentUser(u);
+               updateNavbarLoginStatus();
+               window.location.href = 'index.html';
+               return;
+            }
+
             try {
-               const response = await fetch('http://localhost:3000/signup', {
+               const response = await fetch(apiSignup + '/signup', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
