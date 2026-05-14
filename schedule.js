@@ -151,7 +151,17 @@
       }
 
       paint();
+      root.__pickupRepaint = paint;
    }
+
+   window.addEventListener('pickup-rosters-updated', () => {
+      ['calendar-alioto', 'calendar-moraga'].forEach((id) => {
+         const el = document.getElementById(id);
+         if (el && typeof el.__pickupRepaint === 'function') {
+            el.__pickupRepaint();
+         }
+      });
+   });
 
    document.addEventListener('DOMContentLoaded', () => {
       mountCalendar(document.getElementById('calendar-alioto'));

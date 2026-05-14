@@ -71,6 +71,13 @@
    }
 
    function getRoster(gameId) {
+      if (typeof window !== 'undefined' && window.__USE_FIREBASE_ROSTERS__ && window.PICKUP_ROSTER_CACHE) {
+         if (Object.prototype.hasOwnProperty.call(window.PICKUP_ROSTER_CACHE, gameId)) {
+            var fromCloud = window.PICKUP_ROSTER_CACHE[gameId];
+            return Array.isArray(fromCloud) ? fromCloud.slice() : [];
+         }
+         return [];
+      }
       var map = loadRosterMap();
       if (map && Object.prototype.hasOwnProperty.call(map, gameId)) {
          return map[gameId].slice();
@@ -79,6 +86,9 @@
    }
 
    function setRoster(gameId, players) {
+      if (typeof window !== 'undefined' && window.__USE_FIREBASE_ROSTERS__) {
+         return;
+      }
       var map = loadRosterMap() || {};
       map[gameId] = players;
       saveRosterMap(map);

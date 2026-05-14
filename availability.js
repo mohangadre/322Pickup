@@ -151,6 +151,22 @@
             var action = btn.getAttribute('data-action');
             if (!gameId) return;
 
+            function afterWrite(err) {
+               if (err) {
+                  console.error('[Availability] Roster update failed:', err);
+               }
+               render();
+            }
+
+            if (window.__USE_FIREBASE_ROSTERS__ && window.PickupRoster) {
+               if (action === 'join') {
+                  window.PickupRoster.join(gameId, user, afterWrite);
+               } else if (action === 'leave') {
+                  window.PickupRoster.leave(gameId, user, afterWrite);
+               }
+               return;
+            }
+
             var roster = getRoster(gameId);
             if (action === 'join') {
                if (roster.length >= MAX_PLAYERS) return;
@@ -168,6 +184,10 @@
          });
       });
    }
+
+   window.addEventListener('pickup-rosters-updated', function () {
+      render();
+   });
 
    document.addEventListener('DOMContentLoaded', function () {
       var logoutLink = document.getElementById('logout-link');
